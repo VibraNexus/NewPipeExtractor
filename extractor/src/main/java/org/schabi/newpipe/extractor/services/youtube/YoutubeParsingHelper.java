@@ -71,6 +71,7 @@ import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeParseException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -971,18 +972,24 @@ public final class YoutubeParsingHelper {
     @Nonnull
     public static List<Image> getImagesFromThumbnailsArray(
             @Nonnull final JsonArray thumbnails) {
-        return thumbnails.stream()
+        // First collect into a mutable List
+        List<Image> list = thumbnails.stream()
                 .filter(JsonObject.class::isInstance)
                 .map(JsonObject.class::cast)
                 .filter(thumbnail -> !isNullOrEmpty(thumbnail.getString("url")))
                 .map(thumbnail -> {
                     final int height = thumbnail.getInt("height", Image.HEIGHT_UNKNOWN);
-                    return new Image(fixThumbnailUrl(thumbnail.getString("url")),
+                    return new Image(
+                            fixThumbnailUrl(thumbnail.getString("url")),
                             height,
                             thumbnail.getInt("width", Image.WIDTH_UNKNOWN),
-                            ResolutionLevel.fromHeight(height));
+                            ResolutionLevel.fromHeight(height)
+                    );
                 })
-                .collect(Collectors.toUnmodifiableList());
+                .collect(Collectors.toList());
+
+        // Then wrap it in Collections.unmodifiableList()
+        return Collections.unmodifiableList(list);
     }
 
     @Nonnull
