@@ -24,6 +24,7 @@ public final class Utils {
     private static final Pattern WWW_PATTERN = Pattern.compile("(https?)?://www\\.");
 
     private Utils() {
+        
         // no instance
     }
 
